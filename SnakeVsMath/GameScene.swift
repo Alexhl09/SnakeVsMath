@@ -28,20 +28,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private var index = 0
     private var background = SKSpriteNode(imageNamed: "Orange_BG")
      var numeroColas = 0
-     var numeroVidas = 0
+     var numeroVidas = 1
     private var gana = SKSpriteNode()
     private var pierde = SKSpriteNode()
     private var respuestaCorrecta = SKSpriteNode()
     private var res = ""
     var numero1 = Int()
     var numero2 = Int()
+    var animacionTime : Double = 10
     
     func crearCabeza()
     {
     
         cabeza = SKSpriteNode(imageNamed: "cabeza_snake")
-        cabeza.position = CGPoint(x: 0, y: -150)
+        cabeza.position = CGPoint(x: 0, y: -200)
         cabeza.setScale(0.5)
+        cabeza.zPosition = 2
         cabeza.physicsBody = SKPhysicsBody(rectangleOf: cabeza.size)
         cabeza.physicsBody?.categoryBitMask = CuerpoFisico.cabeza
         cabeza.physicsBody?.collisionBitMask = CuerpoFisico.respuesta | CuerpoFisico.respuestaCorrecta
@@ -58,7 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var string = "\(numero1) + \(numero2)"
    
         operacionLabel = SKLabelNode(text: string)
-        operacionLabel.fontSize =  45
+        operacionLabel.fontSize =  65
         operacionLabel.position = CGPoint(x: 0, y: 400)
         operacionLabel.fontName = "Arial-BoldMT"
         operacionLabel.physicsBody?.isDynamic = false
@@ -71,73 +73,69 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         cola1 = SKSpriteNode(imageNamed: "cuerpo_snake")
         
         switch numeroColas {
+        case 15:
+            cola1.position = CGPoint(x: 0, y:-700 )
+            break
         case 0:
-            cola1.position = CGPoint(x: cabeza.position.x, y:-220 )
+            cola1.position = CGPoint(x: cabeza.position.x, y:-280 )
             break
         case 1:
-            cola1.position = CGPoint(x: 0, y:-250 )
-            break
-        case 2:
-            cola1.position = CGPoint(x: 0, y:-280 )
-            break
-        case 3:
             cola1.position = CGPoint(x: 0, y:-310 )
             break
-        case 4:
+        case 2:
             cola1.position = CGPoint(x: 0, y:-340 )
             break
-        case 5:
+        case 3:
             cola1.position = CGPoint(x: 0, y:-370 )
-        case 6:
-            cola1.position = CGPoint(x: 0, y:-400 )
             break
-        case 7:
+        case 4:
+            cola1.position = CGPoint(x: 0, y:-400 )
+        case 5:
             cola1.position = CGPoint(x: 0, y:-430 )
             break
-        case 8:
+        case 6:
             cola1.position = CGPoint(x: 0, y:-460 )
             break
+        case 7:
+            cola1.position = CGPoint(x: 0, y: -490 )
+            break
+        case 8:
+            cola1.position = CGPoint(x: 0, y:-510 )
+            break
         case 9:
-            cola1.position = CGPoint(x: 0, y:-590 )
+            cola1.position = CGPoint(x: 0, y:-540 )
             break
         case 10:
-            cola1.position = CGPoint(x: 0, y:-600 )
+            cola1.position = CGPoint(x: 0, y:-570 )
             break
         case 11:
-            cola1.position = CGPoint(x: 0, y:-650 )
+            cola1.position = CGPoint(x: 0, y:-600 )
             break
         case 12:
-            cola1.position = CGPoint(x: 0, y:-350 )
+            cola1.position = CGPoint(x: 0, y:-630 )
             break
         case 13:
-            cola1.position = CGPoint(x: 0, y:-110 )
+            cola1.position = CGPoint(x: 0, y:-660 )
             break
         case 14:
-            cola1.position = CGPoint(x: 0, y:140 )
-            break
-        case 15:
-            cola1.position = CGPoint(x: 0, y:270 )
+            cola1.position = CGPoint(x: 0, y: -690)
             break
         default:
             break
         }
-        
+        cola1.zPosition = 1
         cola1.setScale(0.5)
-        cola1.physicsBody = SKPhysicsBody(rectangleOf: cola1.size)
         cola1.physicsBody?.affectedByGravity = false
         cola1.physicsBody?.isDynamic = false
-        
         self.cola.append(cola1)
-        self.addChild(self.cola[numeroColas])
         numero[index] = true
         index = index + 1
         numeroColas = numeroColas + 1
-        
     }
     func crearMensajeGanador()
     {
         gana = SKSpriteNode(imageNamed: "ganaste")
-        gana.setScale(0.6)
+        gana.setScale(0.5)
         gana.position = CGPoint(x: 0, y: 0)
         gana.zPosition = -1
         addChild(gana)
@@ -145,7 +143,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func crearMensajePerdedor()
     {
         pierde = SKSpriteNode(imageNamed: "perdiste")
-        pierde.setScale(0.6)
+        pierde.setScale(0.5)
         pierde.position = CGPoint(x: 0, y: 0)
         pierde.zPosition = -1
         addChild(pierde)
@@ -159,8 +157,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(background)
         crearCabeza()
         crearOperacion()
+        for index in 1...15
+        {
         crearCola()
-        
+        }
+
         let pregunta = SKAction.run({
             ()
             in
@@ -194,7 +195,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func crearResultNode()
     {
-
+        animacionTime = animacionTime - 0.5
         resupuesta = SKSpriteNode(imageNamed: "punto")
        
         resupuesta.setScale(0.5)
@@ -203,24 +204,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         resupuesta.physicsBody?.collisionBitMask = CuerpoFisico.cabeza
         resupuesta.physicsBody?.contactTestBitMask = CuerpoFisico.cabeza
         resupuesta.physicsBody?.isDynamic = true
-        let miRandomPosition = GKRandomDistribution(lowestValue: -450, highestValue: 400)
+        let miRandomPosition = GKShuffledDistribution(lowestValue: -250, highestValue: 300)
         let posicionXRespuesta  = CGFloat(miRandomPosition.nextInt())
         resupuesta.physicsBody?.affectedByGravity = false
-        resupuesta.position = CGPoint(x:posicionXRespuesta, y: 500)
+        resupuesta.position = CGPoint(x:posicionXRespuesta, y: 800)
         self.addChild(resupuesta)
-      var sum = Int(arc4random_uniform(30))
+      var sum = Int(arc4random_uniform(40)) - 20
         
         res = "\(numero1 + numero2 + sum)"
         print(res)
         textMalaRes = SKLabelNode(text: res)
         textMalaRes.fontSize =  45
-        textMalaRes.position = CGPoint(x: resupuesta.position.x, y: resupuesta.position.y)
+        textMalaRes.position = CGPoint(x: resupuesta.position.x, y: resupuesta.position.y - 15)
         textMalaRes.fontName = "Arial-BoldMT"
         textMalaRes.zPosition = 4
         
         self.addChild(textMalaRes)
        
-        let animacionTime = 5
+        
         var arrayDeAcciones = [SKAction]()
         
         arrayDeAcciones.append(SKAction.move(to: CGPoint(x:posicionXRespuesta, y: -(self.frame.size.height + 30)), duration: TimeInterval(animacionTime)))
@@ -234,7 +235,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func crearResultCorrectaNode()
     {
         
-        
         respuestaCorrecta = SKSpriteNode(imageNamed: "punto")
         respuestaCorrecta.shader = SKShader(fileNamed: "Green_BG")
         respuestaCorrecta.setScale(0.5)
@@ -243,23 +243,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         respuestaCorrecta.physicsBody?.collisionBitMask = CuerpoFisico.cabeza
         respuestaCorrecta.physicsBody?.contactTestBitMask = CuerpoFisico.cabeza
         respuestaCorrecta.physicsBody?.isDynamic = true
-        let miRandomPosition = GKRandomDistribution(lowestValue: -450, highestValue: 400)
+        let miRandomPosition = GKShuffledDistribution(lowestValue: -250, highestValue: 300)
         let posicionXRespuesta  = CGFloat(miRandomPosition.nextInt())
         respuestaCorrecta.physicsBody?.affectedByGravity = false
-        respuestaCorrecta.position = CGPoint(x:posicionXRespuesta, y: 500)
+        respuestaCorrecta.position = CGPoint(x:posicionXRespuesta, y: 800)
        
         self.addChild(respuestaCorrecta)
         res = "\(numero1 + numero2)"
              print(res)
         textRespuesta = SKLabelNode(text: res)
         textRespuesta.fontSize =  45
-        textRespuesta.position = CGPoint(x: respuestaCorrecta.position.x, y: respuestaCorrecta.position.y)
+        textRespuesta.position = CGPoint(x: respuestaCorrecta.position.x, y: respuestaCorrecta.position.y - 15)
         textRespuesta.zPosition = 4
         textRespuesta.fontName = "Arial-BoldMT"
         
         self.addChild(textRespuesta)
         
-        let animacionTime = 5
         var arrayDeAcciones = [SKAction]()
         
         arrayDeAcciones.append(SKAction.move(to: CGPoint(x:posicionXRespuesta, y: -(self.frame.size.height + 30)), duration: TimeInterval(animacionTime)))
@@ -274,16 +273,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for touch in touches{
-            let location = touch.location(in: self)
-            
-            cabeza.run(SKAction.moveTo(x: location.x, duration: 0.2))
-            for i in cola
-            {
-                 i.run(SKAction.moveTo(x: cabeza.position.x, duration: 0.4))
-            }
-           
-        }
+//        for touch in touches{
+//            let location = touch.location(in: self)
+//            
+//            cabeza.run(SKAction.moveTo(x: location.x, duration: 0.3))
+//            var d = 0.1
+//            for i in cola
+//            {
+//                 i.run(SKAction.moveTo(x: cabeza.position.x, duration: d))
+//                d = d + 0.025
+//            }
+//           
+//        }
 
         
     }
@@ -292,10 +293,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for touch in touches{
             let location = touch.location(in: self)
             
-            cabeza.run(SKAction.moveTo(x: location.x, duration: 0.2))
+            cabeza.run(SKAction.moveTo(x: location.x, duration: 0.25))
+            var d = 0.2
             for i in cola
             {
-             i.run(SKAction.moveTo(x: cabeza.position.x, duration: 0.2))
+             i.run(SKAction.moveTo(x: cabeza.position.x, duration: d))
+                d = d + 0.025
             }
         }
     }
@@ -319,24 +322,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if firstBody.categoryBitMask == CuerpoFisico.cabeza && secondBody.categoryBitMask == CuerpoFisico.respuesta ||
             firstBody.categoryBitMask == CuerpoFisico.respuesta && secondBody.categoryBitMask == CuerpoFisico.cabeza
         {
-            if numeroColas - 1 > 0
+            if numeroVidas  > 1
             {
             if firstBody.categoryBitMask == CuerpoFisico.respuesta
             {
                 
                 resupuesta.removeFromParent()
-                cola[numeroColas].removeFromParent()
-                numeroColas = numeroColas - 1
-                numeroVidas =  numeroVidas - 1
-                resupuesta.removeFromParent()
+                 textMalaRes.removeFromParent()
+                respuestaCorrecta.removeFromParent()
+                textRespuesta.removeFromParent()
+                numeroVidas = numeroVidas - 1
+                cola[numeroVidas].removeFromParent()
             }
             else if secondBody.categoryBitMask == CuerpoFisico.respuesta
             {
+                respuestaCorrecta.removeFromParent()
+                textRespuesta.removeFromParent()
                 resupuesta.removeFromParent()
-                cola[numeroColas].removeFromParent()
-                numeroColas = numeroColas - 1
+                textMalaRes.removeFromParent()
                 numeroVidas = numeroVidas - 1
-                resupuesta.removeFromParent()
+                cola[numeroVidas].removeFromParent()
             }
             }
             else
@@ -344,10 +349,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 print("acabado")
                 removeAllActions()
                 removeAllChildren()
-                resupuesta.removeFromParent()
-                removeAction(forKey: "respuesta")
-                removeAction(forKey: "pregunta")
-                removeAction(forKey: "respuestaCorrecta")
                 crearMensajePerdedor()
             }
         }
@@ -357,56 +358,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
        else if firstBody.categoryBitMask == CuerpoFisico.cabeza && secondBody.categoryBitMask == CuerpoFisico.respuestaCorrecta ||
             firstBody.categoryBitMask == CuerpoFisico.respuestaCorrecta && secondBody.categoryBitMask == CuerpoFisico.cabeza
         {
-            print("RC")
-            
-            print(index)
-            print(numeroColas)
-            print(numeroVidas)
             
             if numeroVidas < 10
             {
             if firstBody.categoryBitMask == CuerpoFisico.respuestaCorrecta
             {
+                resupuesta.removeFromParent()
+                textMalaRes.removeFromParent()
                 respuestaCorrecta.removeFromParent()
-                numeroVidas =  numeroVidas + 1
                 textRespuesta.removeFromParent()
                 textMalaRes.removeFromParent()
-                if numero[numeroColas + 1] == true
-                {
-                    print(true)
-                    numeroColas = numeroColas + 1
-                  self.addChild(cola[numeroColas])
-                }
-                else
-                {
-                crearCola()
-                }
-                
-                
+                self.addChild(cola[numeroVidas])
+                numeroVidas = numeroVidas + 1
             }
             else if secondBody.categoryBitMask == CuerpoFisico.respuestaCorrecta
-            {
-                textRespuesta.removeFromParent()
-                respuestaCorrecta.removeFromParent()
+                {
+                resupuesta.removeFromParent()
                 textMalaRes.removeFromParent()
-                numeroVidas =  numeroVidas + 1
-                if numero[numeroColas + 1] == true
-                {
-                    print(true)
-                    numeroColas = numeroColas + 1 
-                    self.addChild(cola[numeroColas])
+                respuestaCorrecta.removeFromParent()
+                textRespuesta.removeFromParent()
+                textMalaRes.removeFromParent()
+                self.addChild(cola[numeroVidas])
+                numeroVidas = numeroVidas + 1
                 }
-                else
-                {
-                    crearCola()
-                }
-                
-                
-          
-            }
             }
             else
             {
+                
+                print("acabado")
+                removeAllActions()
+                removeAllChildren()
                 crearMensajeGanador()
             }
             
